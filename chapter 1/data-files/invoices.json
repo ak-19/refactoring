@@ -5,4 +5,12 @@
         {"playId": "as-like", "audience": 35},
         {"playId": "othello", "audience": 40}
     ]
+},
+{
+    "customer": "MediumCo",
+    "performances": [
+        {"playId": "hamlet", "audience": 45},
+        {"playId": "as-like", "audience": 25},
+        {"playId": "othello", "audience": 30}
+    ]
 }]
