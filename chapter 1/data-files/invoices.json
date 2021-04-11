@@ -1,16 +1,19 @@
-[{
+[
+  {
     "customer": "BigCo",
     "performances": [
-        {"playId": "hamlet", "audience": 55},
-        {"playId": "as-like", "audience": 35},
-        {"playId": "othello", "audience": 40}
+      {
+        "playID": "hamlet",
+        "audience": 55
+      },
+      {
+        "playID": "as-like",
+        "audience": 35
+      },
+      {
+        "playID": "othello",
+        "audience": 40
+      }
     ]
-},
-{
-    "customer": "MediumCo",
-    "performances": [
-        {"playId": "hamlet", "audience": 45},
-        {"playId": "as-like", "audience": 25},
-        {"playId": "othello", "audience": 30}
-    ]
-}]
+  }
+]
