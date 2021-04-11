@@ -13,7 +13,6 @@ Amount owed is $1,730.00
 You earned 47 credits
 `; 
         const returnedString = statement(invoices[0], plays);
-        console.log(returnedString);
         expect(expectedString).toEqual(returnedString);
     });
 });
