@@ -1,82 +1,43 @@
+import { createStatementData } from './createStatementData.js';
+
 export function statement(invoice, plays) {
-  const statemenData = {};
-  statemenData.customer = invoice.customer;
-  statemenData.performances = invoice.performances.map(performance => emrichPerformance(performance, plays));
-  statemenData.totalAmount = totalAmountFor(statemenData);
-  statemenData.totalVolumeCredits = totalVolumeCreditsFor(statemenData);
-  return renderPlainText(statemenData, plays);
+  return renderPlainText(createStatementData(invoice, plays));
+}
 
-  function emrichPerformance(performance, plays) {
-    const { name, type } = plays[performance.playID];
-    performance.name = name;
-    performance.type = type;
-    performance.amount = amountFor(performance);
-    performance.volumeCredit = volumeCreditFor(performance)
-    return performance;
+export function htmlStatement(invoice, plays) {
+  return renderHtml(createStatementData(invoice, plays));
+}
+
+function usd(amount) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+  }).format(amount);
+}
+
+function renderPlainText(data) {    
+  let result = `Statement for ${data.customer}\n`;
+
+  for (let perf of data.performances) {
+    result += `  ${perf.name}: ${usd(perf.amount / 100)} (${perf.audience} seats)\n`;
   }
 
-  function totalVolumeCreditsFor(data) {
-    return data.performances.reduce((total, perf) => total + perf.volumeCredit, 0);
-  }
+  result += `Amount owed is ${usd(data.totalAmount / 100)}\n`;
+  result += `You earned ${data.totalVolumeCredits} credits\n`;
+  return result;
+}
 
-  function totalAmountFor(data) {
-    return data.performances.reduce((total, perf) => total + perf.amount, 0);
+function renderHtml (data) {
+  let result = `<h1>Statement for ${data.customer}</h1>\n`;
+  result += "<table>\n";
+  result += "<tr><th>play</th><th>seats</th><th>cost</th></tr>";
+  for (let perf of data.performances) {
+    result += `  <tr><td>${perf.name}</td><td>${perf.audience}</td>`;
+    result += `<td>${usd(perf.amount)}</td></tr>\n`;
   }
-
-  function isComedy(aPerformance) {
-    return "comedy" === aPerformance.type;
-  }
-
-  function volumeCreditFor(aPerformance) {
-    let result = Math.max(aPerformance.audience - 30, 0);
-    if (isComedy(aPerformance)) {
-      result += Math.floor(aPerformance.audience / 5)
-    };
-    return result;
-  }
-
-  function amountFor(aPerformance) {
-    let result = 0;
-  
-    switch (aPerformance.type) {
-      case "tragedy":
-        result = 40000;
-        if (aPerformance.audience > 30) {
-          result += 1000 * (aPerformance.audience - 30);
-        }
-        break;
-      case "comedy":
-        result = 30000;
-        if (aPerformance.audience > 20) {
-          result += 10000 + 500 * (aPerformance.audience - 20);
-        }
-        result += 300 * aPerformance.audience;
-        break;
-      default:
-        throw new Error(`unknown type: ${aPerformance.type}`);
-    }
-  
-    return result;
-  }
-
-  function renderPlainText(data, plays) {    
-    let result = `Statement for ${data.customer}\n`;
-  
-    for (let perf of data.performances) {
-      result += `  ${perf.name}: ${usd(perf.amount / 100)} (${perf.audience} seats)\n`;
-    }
-  
-    result += `Amount owed is ${usd(data.totalAmount / 100)}\n`;
-    result += `You earned ${data.totalVolumeCredits} credits\n`;
-    return result;
-
-          
-    function usd(amount) {
-      return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-        minimumFractionDigits: 2,
-      }).format(amount);
-    }
-  }
+  result += "</table>\n";
+  result += `<p>Amount owed is <em>${usd(data.totalAmount)}</em></p>\n`;
+  result += `<p>You earned <em>${data.totalVolumeCredits}</em> credits</p>\n`;
+  return result;
 }
